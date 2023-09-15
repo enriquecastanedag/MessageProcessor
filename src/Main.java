@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 class MessageListener {
-    List<Message> batch=new ArrayList<>();
-    int counter =0;
+    List<Message> batch = new ArrayList<>();
+    int counter = 0;
     private final Processor processor;
 
     public MessageListener(Processor processor) {
@@ -44,22 +44,24 @@ class MessageListener {
     }
 
     public void messageReceived(Message message) {
-       batch.add(message);
-       batch.sort((a,b)->a.sequence-b.sequence);
-        ListIterator<Message> it=batch.listIterator();
-        List<Message>processed=new ArrayList<>();
-        while (it.hasNext()){
-           Message m=it.next();
-           if(m.sequence==counter){
-               processed.add(m);
-               counter++;
-               it.remove();
-           }
+        batch.add(message);
+        batch.sort((a, b) -> a.sequence - b.sequence);
+        ListIterator<Message> it = batch.listIterator();
+        List<Message> processed = new ArrayList<>();
+        while (it.hasNext()) {
+            Message m = it.next();
+            if (m.sequence == counter) {
+                processed.add(m);
+                counter++;
+                it.remove();
+            }
 
         }
-        System.out.print("Action: Call process([");
-        processed.forEach(message1 -> System.out.print(message1.sequence));
-        System.out.println("])");
+        if (!processed.isEmpty()) {
+            System.out.print("Action: Call process([");
+            processed.forEach(message1 -> System.out.print(message1.sequence));
+            System.out.println("])");
+        }
     }
 
 }
@@ -96,7 +98,7 @@ class PrintSequenceBatch {
     public static void main(String[] args) {
         MessageListener messageListener = new MessageListener(new PrintingProcessor());
 
-        Integer[] test1 = new Integer[] { 1, 4, 0, 2, 5, 6, 7, 3 };
+        Integer[] test1 = new Integer[]{1, 4, 0, 2, 5, 6, 7, 3};
         for (Integer i : test1) {
             messageListener.messageReceived(new Message(i, i.toString()));
         }
